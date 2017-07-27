@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HTTP Telegram Client</title>
+	<meta charset="UTF-8"/>
+	<link rel="icon" href=""/>
+	
+
+	<style type="text/css">
+		*{
+			box-sizing: border-box;
+		}
+		html, body{
+			font-size: 14px;
+			font-family: Arial, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, メイリオ, Meiryo, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+			line-height: 18px;
+		}
+		.floatLeftBox{
+			float: left;
+		}
+		.clearfix:after{
+			content: "";
+			clear: both;
+			display: block;
+			visibility: hidden;
+		}
+
+
+		#telegramTextarea{
+			width: 400px;
+			height: 300px;
+		}
+		#request > div,
+		#response > div{
+			padding: 10px;
+		}
+		.resultText{
+			white-space: pre;
+		}
+	</style>
+</head>
+<body>
+	<div class="clearfix">
+		<div class="floatLeftBox">
+			<textarea id="telegramTextarea"></textarea>
+			<button id="sendButton">Send</button>
+		</div>
+		<div class="clearfix floatLeftBox">
+			<div id="request" class="floatLeftBox">
+				<div>HTTP Request</div>
+				<div class="resultText"></div>
+			</div>
+			<div id="response" class="floatLeftBox">
+				<div>HTTP Response</div>
+				<div class="resultText"></div>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+	<script type="text/javascript">
+		var $telegramTextarea = $("#telegramTextarea");
+		var $requestContent = $("#request .resultText");
+		var $responseContent = $("#response .resultText");
+
+		$("#sendButton").on("click", function(event){
+			var val = $telegramTextarea.val();
+			if(!val){
+				return;
+			}
+
+			//改行コードの書き換え
+			val = val.replace(/\n/gm, "\r\n");
+
+			//結果 初期化
+			$requestContent.text("");
+			$responseContent.text("");
+
+			//データ送信
+			$.ajax({
+				method: "POST",
+				data: val,
+				contentType: "text/plain"
+			}).done(function(data){
+				if(data.status === 'success'){
+					$requestContent.text(data.request);
+					$responseContent.text(data.response);
+				}else{
+					console.log(data);
+				}
+
+			}).fail(function(xhr, status, err){
+				console.error(xhr);
+			});
+		});
+	</script>
+</body>
+</html>
